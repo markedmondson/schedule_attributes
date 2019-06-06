@@ -14,23 +14,23 @@ describe ScheduleAttributes::RuleParser::Week do
   let(:weekends)      { [sat, sun, sat+1.week, sun+1.week, sat+2.weeks, sun+2.weeks] }
 
   describe "#rule" do
-    let(:input)  { ScheduleAttributes::Input.new(example.metadata[:args]) }
+    let(:input)  { ScheduleAttributes::Input.new(RSpec.current_example.metadata[:args]) }
     let(:parser) { described_class.new(input) }
     subject      { parser.rule }
 
-    context args: {} do
-      it { should == IceCube::Rule.weekly }
-      its_occurrences_until(5.weeks.from_now) { should == weekly }
+    context 'no arguments', args: {} do
+      it { is_expected.to eq(IceCube::Rule.weekly) }
+      it_has_occurrences_until(5.weeks.from_now) { is_expected.to eq(weekly) }
     end
 
-    context args: {"interval" => "2"} do
-      it { should == IceCube::Rule.weekly(2) }
-      its_occurrences_until(5.weeks.from_now) { should == every_2_weeks }
+    context 'interval argument', args: {"interval" => "2"} do
+      it { is_expected.to eq(IceCube::Rule.weekly(2)) }
+      it_has_occurrences_until(5.weeks.from_now) { is_expected.to eq(every_2_weeks) }
     end
 
-    context args: {"monday" => "0", "saturday" => "1", "sunday" => "1"} do
-      it { should == IceCube::Rule.weekly.day(0,6) }
-      its_occurrences_until(Date.today.beginning_of_week+3.weeks) { subject[-4..-1].should == weekends[-4..-1] }
+    context 'several day name arguments', args: {"monday" => "0", "saturday" => "1", "sunday" => "1"} do
+      it { is_expected.to eq(IceCube::Rule.weekly.day(0,6)) }
+      it_has_occurrences_until(Date.today.beginning_of_week+3.weeks) { expect(subject[-4..-1]).to eq weekends[-4..-1] }
     end
   end
 end

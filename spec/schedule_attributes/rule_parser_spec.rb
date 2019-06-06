@@ -11,7 +11,7 @@ describe ScheduleAttributes::RuleParser do
     }. each do |key,parser_class|
 
       it "returns parser for #{key} interval units" do
-        ScheduleAttributes::RuleParser[key].should == parser_class
+        expect(ScheduleAttributes::RuleParser[key]).to eq(parser_class)
       end
     end
   end

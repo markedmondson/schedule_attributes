@@ -3,9 +3,9 @@ module SpecHelpers
     extend ActiveSupport::Concern
 
     module ClassMethods
-      def its_occurrences_until(date, &block)
+      def it_has_occurrences_until(date, &block)
         describe "occurrences" do
-          shared_examples do
+          shared_examples "occurrences" do
 
             orig_subject = subject
 

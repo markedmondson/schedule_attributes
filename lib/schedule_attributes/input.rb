@@ -119,19 +119,44 @@ module ScheduleAttributes
     def end_time
       return nil if @params[:all_day]
       return nil unless @params[:end_time].present?
-      parse_date_time(date_input, @params[:end_time])
+      parse_date_time(end_time_date, @params[:end_time])
+    end
+
+    # if end_time < start_time, the schedule occurs over night
+    def end_time_date
+      return date_input unless @params[:start_time].present?
+      return nil if @params[:all_day]
+      return nil unless @params[:end_time].present?
+      parse_date_time(date_input, @params[:end_time]) <= start_time ? (Time.parse(date_input) + 1.day).strftime('%Y-%m-%d') : date_input
     end
 
     def start_date
-      parse_date_time(@params[:start_date]) if @params[:start_date]
+      if @params[:start_date]
+        parse_date_time(@params[:start_date], @params[:start_time])
+      elsif @params[:start_time] && !time_only?(@params[:start_time])
+        parse_date_time(@params[:start_time])
+      elsif start_time
+        start_time
+      else
+        parse_date_time(@params[:start_time])
+      end
     end
 
     def end_date
-      parse_date_time(@params[:end_date], @params[:start_time]) if @params[:end_date]
+      if @params[:end_date]
+        parse_date_time(@params[:end_date], @params[:end_time] || @params[:start_time])
+      elsif @params[:end_time] && !time_only?(@params[:end_time])
+        parse_date_time(@params[:end_time])
+      elsif end_time
+        end_time
+      else
+        parse_date_time(@params[:end_time])
+      end
     end
 
     def ends?
-      @params[:end_date].present? && @params[:ends] != "never"
+      return false if @params[:ends] == "never"
+      @params[:end_date].present? || @params[:end_time].present?
     end
 
     def dates
@@ -146,6 +171,10 @@ module ScheduleAttributes
       date_time_parts = [date, time].compact
       return if date_time_parts.empty?
       TimeHelpers.parse_in_zone(date_time_parts.join(' '))
+    end
+
+    def time_only?(string)
+      !!(string.strip =~ /\d{1,2}\:\d{2}/)
     end
   end
 end

@@ -31,6 +31,17 @@ class CustomScheduledActiveRecordModel < ActiveRecord::Base
   end
 end
 
+class CustomScheduledMethodActiveRecordModel < ActiveRecord::Base
+  self.table_name = :calendars
+  has_schedule_attributes default_schedule: :today
+
+  def self.today
+    s = IceCube::Schedule.new(Date.today.to_time)
+    s.add_recurrence_rule IceCube::SingleOccurrenceRule.new(Date.today)
+    s
+  end
+end
+
 class DefaultScheduledActiveRecordModel < ActiveRecord::Base
   self.table_name = :calendars
   has_schedule_attributes

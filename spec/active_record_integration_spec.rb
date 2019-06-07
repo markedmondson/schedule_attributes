@@ -16,6 +16,20 @@ describe CustomScheduledActiveRecordModel do
 
 end
 
+describe CustomScheduledMethodActiveRecordModel do
+
+  it "should have a default schedule" do
+    subject.schedule.should == today
+  end
+
+  def today
+    IceCube::Schedule.new(Date.today.to_time).tap { |s|
+      s.add_recurrence_rule IceCube::SingleOccurrenceRule.new(Date.today)
+    }
+  end
+
+end
+
 describe DefaultScheduledActiveRecordModel do
   alias :model :subject
 

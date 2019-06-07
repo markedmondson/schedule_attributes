@@ -7,9 +7,16 @@ module ScheduleAttributes::ActiveRecord
 
   module ClassMethods
     attr_accessor :schedule_field
-    attr_accessor :default_schedule
+    attr_writer   :default_schedule
 
     def default_schedule
+      @default_schedule = case @default_schedule
+      when Proc
+        @default_schedule.call
+      when Symbol, String
+        self.public_send(@default_schedule)
+      end if @default_schedule
+
       @default_schedule || ScheduleAttributes.default_schedule
     end
   end
